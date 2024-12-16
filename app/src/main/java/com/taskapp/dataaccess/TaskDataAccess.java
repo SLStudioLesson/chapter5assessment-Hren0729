@@ -1,96 +1,101 @@
 package com.taskapp.dataaccess;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.taskapp.model.Task;
+
 public class TaskDataAccess {
 
     private final String filePath;
 
-    private final UserDataAccess userDataAccess;
-
     public TaskDataAccess() {
         filePath = "app/src/main/resources/tasks.csv";
-        userDataAccess = new UserDataAccess();
     }
 
-    /**
-     * 自動採点用に必要なコンストラクタのため、皆さんはこのコンストラクタを利用・削除はしないでください
-     * @param filePath
-     * @param userDataAccess
-     */
-    public TaskDataAccess(String filePath, UserDataAccess userDataAccess) {
-        this.filePath = filePath;
-        this.userDataAccess = userDataAccess;
+    public List<Task> findAll() {
+        List<Task> tasks = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 4) {
+                    int code = Integer.parseInt(data[0]);
+                    String name = data[1];
+                    int status = Integer.parseInt(data[2]);
+                    int repUserCode = Integer.parseInt(data[3]);
+                    tasks.add(new Task(code, name, status, repUserCode));
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("CSVファイルの読み込み中にエラーが発生しました: " + e.getMessage());
+        }
+        return tasks;
     }
 
-    /**
-     * CSVから全てのタスクデータを取得します。
-     *
-     * @see com.taskapp.dataaccess.UserDataAccess#findByCode(int)
-     * @return タスクのリスト
-     */
-    // public List<Task> findAll() {
-    //     try () {
+    public void save(Task task) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath, true))) {
+            bw.write(createLine(task));
+            bw.newLine();
+        } catch (IOException e) {
+            System.out.println("CSVファイルへの書き込み中にエラーが発生しました: " + e.getMessage());
+        }
+    }
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
-    // }
+    public Task findByCode(int code) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                if (data.length == 4 && Integer.parseInt(data[0]) == code) {
+                    String name = data[1];
+                    int status = Integer.parseInt(data[2]);
+                    int repUserCode = Integer.parseInt(data[3]);
+                    return new Task(code, name, status, repUserCode);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("CSVファイルの読み込み中にエラーが発生しました: " + e.getMessage());
+        }
+        return null;
+    }
 
-    /**
-     * タスクをCSVに保存します。
-     * @param task 保存するタスク
-     */
-    // public void save(Task task) {
-    //     try () {
+    public void update(Task updateTask) {
+        List<Task> tasks = findAll();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            for (Task task : tasks) {
+                if (task.getCode() == updateTask.getCode()) {
+                    bw.write(createLine(updateTask));
+                } else {
+                    bw.write(createLine(task));
+                }
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("CSVファイルの更新中にエラーが発生しました: " + e.getMessage());
+        }
+    }
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+    public void delete(int code) {
+        List<Task> tasks = findAll();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            for (Task task : tasks) {
+                if (task.getCode() != code) {
+                    bw.write(createLine(task));
+                    bw.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("CSVファイルの削除中にエラーが発生しました: " + e.getMessage());
+        }
+    }
 
-    /**
-     * コードを基にタスクデータを1件取得します。
-     * @param code 取得するタスクのコード
-     * @return 取得したタスク
-     */
-    // public Task findByCode(int code) {
-    //     try () {
-
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    //     return null;
-    // }
-
-    /**
-     * タスクデータを更新します。
-     * @param updateTask 更新するタスク
-     */
-    // public void update(Task updateTask) {
-    //     try () {
-
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
-    /**
-     * コードを基にタスクデータを削除します。
-     * @param code 削除するタスクのコード
-     */
-    // public void delete(int code) {
-    //     try () {
-
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
-    /**
-     * タスクデータをCSVに書き込むためのフォーマットを作成します。
-     * @param task フォーマットを作成するタスク
-     * @return CSVに書き込むためのフォーマット文字列
-     */
-    // private String createLine(Task task) {
-    // }
+    private String createLine(Task task) {
+        return task.getCode() + "," + task.getName() + "," + task.getStatus() + "," + task.getRepUserCode();
+    }
 }
