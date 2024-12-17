@@ -11,10 +11,7 @@ public class UserLogic {
         userDataAccess = new UserDataAccess();
     }
 
-    /**
-     * 自動採点用に必要なコンストラクタのため、皆さんはこのコンストラクタを利用・削除はしないでください
-     * @param userDataAccess
-     */
+    // 依存性注入用のコンストラクタ
     public UserLogic(UserDataAccess userDataAccess) {
         this.userDataAccess = userDataAccess;
     }
@@ -22,30 +19,21 @@ public class UserLogic {
     /**
      * ユーザーのログイン処理を行います。
      *
-     * @see com.taskapp.dataaccess.UserDataAccess#findByEmailAndPassword(String, String)
      * @param email ユーザーのメールアドレス
      * @param password ユーザーのパスワード
      * @return ログインしたユーザーの情報
      * @throws AppException メールアドレスとパスワードが一致するユーザーが存在しない場合にスローされます
      */
-public User login(String email, String password) throws AppException {
-        // 入力チェック
-        if (email == null || email.isEmpty()) {
-            throw new AppException("メールアドレスを入力してください");
-        }
-        if (password == null || password.isEmpty()) {
-            throw new AppException("パスワードを入力してください");
-        }
-
-        // データベースからユーザーを取得
-        User user = userDataAccess.findByEmailAndPassword(email.trim(), password.trim());
+    public User login(String email, String password) throws AppException {
+        // メールアドレスとパスワードでユーザーを検索
+        User user = userDataAccess.findByEmailAndPassword(email, password);
 
         // ユーザーが見つからない場合
         if (user == null) {
-            throw new AppException("既に登録されているメールアドレス、パスワードを入力してください");
+            throw new AppException("メールアドレスまたはパスワードが間違っています。");
         }
 
-        // 正常にログインできた場合
+        System.out.println("ユーザー名：" + user.getName() + "でログインしました。");
         return user;
     }
 }
