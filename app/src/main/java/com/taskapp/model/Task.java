@@ -4,9 +4,9 @@ public class Task {
     private int code;
     private String name;
     private int status;
-    private User repUser;
+    private int repUser;
 
-    public Task(int code, String name, int status, User repUser) {
+    public Task(int code, String name, int status, int repUser) {
         this.code = code;
         this.name = name;
         this.status = status;
@@ -25,7 +25,7 @@ public class Task {
         return this.status;
     }
 
-    public User getRepUser() {
+    public int getRepUser() {
         return this.repUser;
     }
 
@@ -33,6 +33,9 @@ public class Task {
         this.status = status;
     }
 
+    public void setName(String name){
+        this.name=name;
+    }
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -54,6 +57,4 @@ public class Task {
 			return false;
 		return true;
 	}
-
-    
 }

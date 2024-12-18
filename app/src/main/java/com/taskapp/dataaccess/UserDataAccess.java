@@ -27,6 +27,7 @@ public class UserDataAccess {
      * @param password パスワード
      * @return 見つかったユーザー
      */
+    // UserDataAccessクラスでuser.csvの読み込みエラーがあった
     public User findByEmailAndPassword(String email, String password) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
