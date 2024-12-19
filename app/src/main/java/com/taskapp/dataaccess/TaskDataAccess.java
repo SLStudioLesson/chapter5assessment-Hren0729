@@ -142,7 +142,7 @@ public class TaskDataAccess {
      * @return CSVに書き込むためのフォーマット文字列
      */
     private String createLine(Task task) {
-        return String.format("%d,%s,%d,%d", task.getCode(), task.getName(), task.getStatus(), task.getRepUser());
+        return String.format("%d,%s,%d,%d", task.getCode(), task.getName(), task.getStatus(), task.getRepUser().getCode());
     }
 
     /**

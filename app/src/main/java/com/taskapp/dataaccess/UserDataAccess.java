@@ -63,7 +63,7 @@ public class UserDataAccess {
     public User findByCode(int code) {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-
+            br.readLine(); // ヘッダー行をスキップ
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
 
