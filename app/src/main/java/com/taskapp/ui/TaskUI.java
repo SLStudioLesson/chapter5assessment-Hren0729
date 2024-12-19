@@ -40,8 +40,8 @@ public class TaskUI {
 
         while (isRunning) {
             try {
-                System.out.println("以下1~4のメニューから好きな選択肢を選んでください。");
-                System.out.println("1. タスク一覧, 2. タスク新規登録, 3. タスク情報変更, 4. ログアウト");
+                System.out.println("以下1~3のメニューから好きな選択肢を選んでください。");
+                System.out.println("1. タスク一覧, 2. タスク新規登録, 3. ログアウト");
                 System.out.print("選択肢：");
                 String selectMenu = reader.readLine();
                 System.out.println();
@@ -50,19 +50,17 @@ public class TaskUI {
                 switch (selectMenu) {
                     case "1":
                         taskLogic.showAll(loginUser);
+                        selectSubMenu();
                         break;
                     case "2":
                         inputNewInformation();
                         break;
                     case "3":
-                        selectSubMenu();
-                        break;
-                    case "4":
                         System.out.println("ログアウトしました");
                         isRunning = false;
                         break;
                     default:
-                        System.out.println("選択肢が誤っています。1~4の中から選択してください。");
+                        System.out.println("選択肢が誤っています。1~3の中から選択してください。");
                         break;
                 }
             } catch (IOException e) {
@@ -165,7 +163,6 @@ public class TaskUI {
 
                 // ログイン情報を呼び出す
                 loginUser = userLogic.login(email, password);
-                System.out.println("ユーザー名：" + loginUser.getName() + "でログインしました。");
                 isLoginSuccessful = true; // ログイン成功
                 
             } catch (IOException e) {

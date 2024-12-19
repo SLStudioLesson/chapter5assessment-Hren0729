@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.taskapp.model.Task;
+import com.taskapp.model.User;
 
 public class TaskDataAccess {
 
@@ -32,35 +33,42 @@ public class TaskDataAccess {
     public List<Task> findAll() {
         List<Task> tasks = new ArrayList<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("app/src/main/resources/tasks.csv"))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-
-
-            br.readLine();
+            br.readLine(); // ヘッダー行をスキップ
             while ((line = br.readLine()) != null) {
-
-
-
                 // 行のデータを分割
                 String[] data = line.split(",");
-
+    
                 // カラム数を確認
-                if (data.length !=4) {
+                if (data.length != 4) {
                     System.err.println("Skipping invalid line (unexpected column count): " + line);
                     continue;
                 }
     
+                // 各カラムの妥当性を確認
+                if (!isNumeric(data[0]) || !isNumeric(data[2]) || !isNumeric(data[3])) {
+                    System.err.println("Skipping invalid line (parsing error): " + line);
+                    continue;
+                }
+    
                 try {
-                    // 数値変換
                     int code = Integer.parseInt(data[0]);
                     String name = data[1];
                     int status = Integer.parseInt(data[2]);
-                    int repUserCode = Integer.parseInt(data[3]);
-                    
+                    int userCode = Integer.parseInt(data[3]);
+    
+                    // Userオブジェクトを取得
+                    User repUser = userDataAccess.findByCode(userCode);
+                    if (repUser == null) {
+                        System.err.println("Skipping invalid line (user not found): " + line);
+                        continue;
+                    }
+    
                     // タスクオブジェクトを作成してリストに追加
-                    tasks.add(new Task(code, name, status,repUserCode));
+                    tasks.add(new Task(code, name, status, repUser));
                 } catch (NumberFormatException e) {
-                    System.err.println("Skipping invalid line (parsing error): " + line);
+                    System.err.println("Skipping invalid line (unexpected number format): " + line);
                 }
             }
         } catch (IOException e) {
@@ -68,6 +76,7 @@ public class TaskDataAccess {
         }
         return tasks;
     }
+
 
     /**
      * タスクをCSVに保存します。
@@ -123,18 +132,8 @@ public class TaskDataAccess {
      *
      * @param code 削除するタスクのコード
      */
-    public void delete(int code) {
-        List<Task> tasks = findAll();
-        try (PrintWriter pw = new PrintWriter(new FileWriter(filePath))) {
-            for (Task task : tasks) {
-                if (task.getCode() != code) {
-                    pw.println(createLine(task)); // 削除対象以外を書き込む
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    // public void delete(int code) {
+    // }
 
     /**
      * タスクデータをCSVに書き込むためのフォーマットを作成します。
@@ -144,5 +143,23 @@ public class TaskDataAccess {
      */
     private String createLine(Task task) {
         return String.format("%d,%s,%d,%d", task.getCode(), task.getName(), task.getStatus(), task.getRepUser());
+    }
+
+    /**
+     * 文字列が数値であるかを判定します。
+     *
+     * @param input チェック対象の文字列
+     * @return 数値ならtrue、それ以外はfalse
+     */
+    private boolean isNumeric(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

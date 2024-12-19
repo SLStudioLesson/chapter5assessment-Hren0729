@@ -4,9 +4,9 @@ public class Task {
     private int code;
     private String name;
     private int status;
-    private int repUser;
+    private User repUser;
 
-    public Task(int code, String name, int status, int repUser) {
+    public Task(int code, String name, int status, User repUser) {
         this.code = code;
         this.name = name;
         this.status = status;
@@ -25,7 +25,7 @@ public class Task {
         return this.status;
     }
 
-    public int getRepUser() {
+    public User getRepUser() {
         return this.repUser;
     }
 

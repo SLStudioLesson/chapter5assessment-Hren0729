@@ -36,20 +36,16 @@ public class UserDataAccess {
             br.readLine(); // ヘッダー行をスキップ
     
             while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
+                String[] data = line.split(",",-1);
     
                 // データの長さが正しいか確認
                 if (data.length == 4) {
-                    System.out.println("デバッグ: 読み込んだデータ - " + String.join(",", data));  // デバッグ出力
-    
                     // メールアドレスとパスワードが一致するかを確認
                     if (data[2].equals(email) && data[3].equals(password)) {
                         int code = Integer.parseInt(data[0]);
                         String userName = data[1];
                         return new User(code, email, password, userName);
                     }
-                } else {
-                    System.out.println("デバッグ: 不正なデータ形式 - " + line);
                 }
             }
         } catch (IOException e) {

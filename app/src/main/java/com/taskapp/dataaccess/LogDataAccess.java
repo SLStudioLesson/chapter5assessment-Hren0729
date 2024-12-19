@@ -44,13 +44,13 @@ public class LogDataAccess {
     public List<Log> findAll() {
         List<Log> logs = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
 
+            String line;
             // ヘッダー行の読み飛ばし
             br.readLine();
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-
+                
                 if (data.length != 4) {
                     System.err.println("Skipping invalid line (unexpected column count): " + line);
                     continue;
